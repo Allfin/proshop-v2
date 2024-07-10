@@ -72,7 +72,6 @@ const ShippingScreen = () => {
             type='text'
             placeholder='Catatan untuk kurir'
             value={curierNote}
-            required
             onChange={(e) => setCurierNote(e.target.value)}
           ></Form.Control>
         </Form.Group>
