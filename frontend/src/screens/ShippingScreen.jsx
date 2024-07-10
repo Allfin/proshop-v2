@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
-import { saveShippingAddress } from '../slices/cartSlice';
+import { saveShippingDetails } from '../slices/cartSlice';
 
 const ShippingScreen = () => {
   // catatan yang dihapus
@@ -15,17 +15,17 @@ const ShippingScreen = () => {
   // 4. tax price
 
   const cart = useSelector((state) => state.cart);
-  const { shippingAddress } = cart;
+  const { shippingDetails } = cart;
 
-  const [address, setAddress] = useState(shippingAddress.address || '');
+  const [address, setAddress] = useState(shippingDetails.address || '');
   const [recipientName, setRecipientName] = useState(
-    shippingAddress.city || ''
+    shippingDetails.recipientName || ''
   );
   const [curierNote, setCurierNote] = useState(
-    shippingAddress.curierNote || ''
+    shippingDetails.curierNote || ''
   );
   const [numberPhone, setNumberPhone] = useState(
-    shippingAddress.numberPhone || ''
+    shippingDetails.numberPhone || ''
   );
 
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const ShippingScreen = () => {
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(
-      saveShippingAddress({ address, recipientName, curierNote, numberPhone })
+      saveShippingDetails({ address, recipientName, curierNote, numberPhone })
     );
     navigate('/payment');
   };
@@ -55,7 +55,7 @@ const ShippingScreen = () => {
           ></Form.Control>
         </Form.Group>
 
-        <Form.Group className='my-2' controlId='city'>
+        <Form.Group className='my-2' controlId='recipientName'>
           <Form.Label>Nama Penerima</Form.Label>
           <Form.Control
             type='text'

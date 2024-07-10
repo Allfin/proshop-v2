@@ -122,9 +122,9 @@ const OrderScreen = () => {
               </p>
               <p>
                 <strong>Address:</strong>
-                {order.shippingAddress.address}, {order.shippingAddress.city}{' '}
-                {order.shippingAddress.postalCode},{' '}
-                {order.shippingAddress.country}
+                {order.shippingDetails.address}, {order.shippingDetails.city}{' '}
+                {order.shippingDetails.postalCode},{' '}
+                {order.shippingDetails.country}
               </p>
               {order.isDelivered ? (
                 <Message variant='success'>

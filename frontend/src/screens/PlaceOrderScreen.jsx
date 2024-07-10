@@ -17,19 +17,19 @@ const PlaceOrderScreen = () => {
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
   useEffect(() => {
-    if (!cart.shippingAddress.address) {
+    if (!cart.shippingDetails.address) {
       navigate('/shipping');
     } else if (!cart.paymentMethod) {
       navigate('/payment');
     }
-  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
+  }, [cart.paymentMethod, cart.shippingDetails.address, navigate]);
 
   const dispatch = useDispatch();
   const placeOrderHandler = async () => {
     try {
       const res = await createOrder({
         orderItems: cart.cartItems,
-        shippingAddress: cart.shippingAddress,
+        shippingDetails: cart.shippingDetails,
         paymentMethod: cart.paymentMethod,
         itemsPrice: cart.itemsPrice,
         shippingPrice: cart.shippingPrice,
@@ -37,7 +37,7 @@ const PlaceOrderScreen = () => {
         totalPrice: cart.totalPrice,
       }).unwrap();
       dispatch(clearCartItems());
-      navigate(`/order/`);
+      navigate(`/order/${res._id}`);
     } catch (err) {
       toast.error(err);
     }
@@ -53,9 +53,9 @@ const PlaceOrderScreen = () => {
               <h2>Shipping</h2>
               <p>
                 <strong>Address:</strong>
-                {cart.shippingAddress.address}, {cart.shippingAddress.city}{' '}
-                {cart.shippingAddress.postalCode},{' '}
-                {cart.shippingAddress.country}
+                {cart.shippingDetails.address}, {cart.shippingDetails.city}{' '}
+                {cart.shippingDetails.postalCode},{' '}
+                {cart.shippingDetails.country}
               </p>
             </ListGroup.Item>
 
