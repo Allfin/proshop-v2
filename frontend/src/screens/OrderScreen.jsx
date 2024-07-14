@@ -58,22 +58,49 @@ const OrderScreen = () => {
     }
   }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
 
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        await payOrder({ orderId, details });
-        refetch();
-        toast.success('Order is paid');
-      } catch (err) {
-        toast.error(err?.data?.message || err.error);
-      }
-    });
-  }
+  const onApprove = async (data, actions) => {
+    const parameter = {
+      item_details: {
+        name: 'Kain ulos',
+        price: order.itemsPrice,
+        quantity: 2,
+      },
+      transaction_details: {
+        order_id: 1,
+        gross_amount: order.totalPrice,
+      },
+    };
+    try {
+      const result = await payOrder({
+        orderId,
+        details: parameter,
+      }).unwrap();
+      console.log('Berhasil bayar', result);
+    } catch (error) {
+      console.log('Gagal bayar', error);
+    }
+  };
 
   // TESTING ONLY! REMOVE BEFORE PRODUCTION
   // async function onApproveTest() {
-  //   await payOrder({ orderId, details: { payer: {} } });
-  //   refetch();
+  //   const parameter = {
+  //     item_details: {
+  //       name: 'Kain ulos',
+  //       price: 35000,
+  //       quantity: 2,
+  //     },
+  //     transaction_details: {
+  //       order_id: 1,
+  //       gross_amount: 3500 * 2,
+  //     },
+  //   };
+  //   await payOrder({
+  //     orderId,
+  //     details: parameter,
+  //   });
+  //   // refetch();
+
+  //   // console.log(parameter);
 
   //   toast.success('Order is paid');
   // }
@@ -220,12 +247,12 @@ const OrderScreen = () => {
                   ) : (
                     <div>
                       {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-                      {/* <Button
+                      <Button
                         style={{ marginBottom: '10px' }}
-                        onClick={onApproveTest}
+                        onClick={onApprove}
                       >
                         Test Pay Order
-                      </Button> */}
+                      </Button>
 
                       <div>
                         <PayPalButtons
