@@ -16,6 +16,7 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import Meta from '../components/Meta';
 import { addToCart } from '../slices/cartSlice';
+import { formatRupiah } from '../utils/price';
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
@@ -76,7 +77,7 @@ const ProductScreen = () => {
                     <Row>
                       <Col>Harga:</Col>
                       <Col>
-                        <strong>${product.price}</strong>
+                        <strong>{formatRupiah(product.price)}</strong>
                       </Col>
                     </Row>
                   </ListGroup.Item>

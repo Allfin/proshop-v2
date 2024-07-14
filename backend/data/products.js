@@ -5,7 +5,7 @@ const products = [
     description:
       'Bluetooth technology lets you connect it with compatible devices wirelessly High-quality AAC audio offers immersive listening experience Built-in microphone allows you to take calls while working',
     brand: 'Apple',
-    price: 89.99,
+    price: 100000,
     countInStock: 10,
   },
   {
@@ -14,7 +14,7 @@ const products = [
     description:
       'Introducing the iPhone 13 Pro. A transformative triple-camera system that adds tons of capability without complexity. An unprecedented leap in battery life',
     brand: 'Apple',
-    price: 599.99,
+    price: 200000,
     countInStock: 7,
   },
   {
@@ -23,7 +23,7 @@ const products = [
     description:
       'Characterized by versatile imaging specs, the Canon EOS 80D further clarifies itself using a pair of robust focusing systems and an intuitive design',
     brand: 'Cannon',
-    price: 929.99,
+    price: 400000,
     countInStock: 5,
   },
   {
@@ -32,7 +32,7 @@ const products = [
     description:
       'The ultimate home entertainment center starts with PlayStation. Whether you are into gaming, HD movies, television, music',
     brand: 'Sony',
-    price: 399.99,
+    price: 600000,
     countInStock: 11,
   },
   {
@@ -41,7 +41,7 @@ const products = [
     description:
       'Get a better handle on your games with this Logitech LIGHTSYNC gaming mouse. The six programmable buttons allow customization for a smooth playing experience',
     brand: 'Logitech',
-    price: 49.99,
+    price: 400000,
     countInStock: 7,
   },
   {
@@ -50,7 +50,7 @@ const products = [
     description:
       'Meet Echo Dot - Our most popular smart speaker with a fabric design. It is our most compact smart speaker that fits perfectly into small space',
     brand: 'Amazon',
-    price: 29.99,
+    price: 700000,
     countInStock: 0,
   },
 ];

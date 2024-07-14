@@ -17,15 +17,15 @@ const ShippingScreen = () => {
   const cart = useSelector((state) => state.cart);
   const { shippingDetails } = cart;
 
-  const [address, setAddress] = useState(shippingDetails.address || '');
+  const [address, setAddress] = useState(shippingDetails?.address || '');
   const [recipientName, setRecipientName] = useState(
-    shippingDetails.recipientName || ''
+    shippingDetails?.recipientName || ''
   );
   const [curierNote, setCurierNote] = useState(
-    shippingDetails.curierNote || ''
+    shippingDetails?.curierNote || ''
   );
   const [numberPhone, setNumberPhone] = useState(
-    shippingDetails.numberPhone || ''
+    shippingDetails?.numberPhone || ''
   );
 
   const dispatch = useDispatch();
