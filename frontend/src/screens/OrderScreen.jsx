@@ -81,30 +81,6 @@ const OrderScreen = () => {
     }
   };
 
-  // TESTING ONLY! REMOVE BEFORE PRODUCTION
-  // async function onApproveTest() {
-  //   const parameter = {
-  //     item_details: {
-  //       name: 'Kain ulos',
-  //       price: 35000,
-  //       quantity: 2,
-  //     },
-  //     transaction_details: {
-  //       order_id: 1,
-  //       gross_amount: 3500 * 2,
-  //     },
-  //   };
-  //   await payOrder({
-  //     orderId,
-  //     details: parameter,
-  //   });
-  //   // refetch();
-
-  //   // console.log(parameter);
-
-  //   toast.success('Order is paid');
-  // }
-
   function onError(err) {
     toast.error(err.message);
   }
@@ -186,15 +162,15 @@ const OrderScreen = () => {
                       <Row>
                         <Col md={1}>
                           <Image
-                            src={item.image}
-                            alt={item.name}
+                            src={item.product.image}
+                            alt={item.product.name}
                             fluid
                             rounded
                           />
                         </Col>
                         <Col>
-                          <Link to={`/product/${item.product}`}>
-                            {item.name}
+                          <Link to={`/product/${item.product._id}`}>
+                            {item.product.name}
                           </Link>
                         </Col>
                         <Col md={4}>
