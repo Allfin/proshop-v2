@@ -1,4 +1,5 @@
 import asyncHandler from '../middleware/asyncHandler.js';
+import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
@@ -44,7 +45,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
     const order = new Order({
       orderItems: dbOrderItems,
-      user: req.user._id,
+      user: req.body.userId,
       shippingDetails,
       paymentMethod,
       itemsPrice,

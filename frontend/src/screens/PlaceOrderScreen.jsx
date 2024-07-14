@@ -14,6 +14,7 @@ const PlaceOrderScreen = () => {
   const navigate = useNavigate();
 
   const cart = useSelector((state) => state.cart);
+  const auth = useSelector((state) => state.auth);
 
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
@@ -30,6 +31,7 @@ const PlaceOrderScreen = () => {
     try {
       const res = await createOrder({
         orderItems: cart.cartItems,
+        userId: auth.userInfo._id,
         shippingDetails: cart.shippingDetails,
         paymentMethod: cart.paymentMethod,
         itemsPrice: cart.itemsPrice,
