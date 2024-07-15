@@ -1,15 +1,12 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
-  useGetPaypalClientIdQuery,
   usePayOrderMutation,
 } from '../slices/ordersApiSlice';
 import { formatRupiah } from '../utils/price';
@@ -21,15 +18,12 @@ const OrderScreen = () => {
 
   const { order, client_key } = data || {};
 
-  const [payOrder, { data: getToken, isLoading: loadingPay }] =
-    usePayOrderMutation();
+  const [payOrder] = usePayOrderMutation();
 
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
 
   const { userInfo } = useSelector((state) => state.auth);
-
-  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
   const onApprove = async () => {
     try {
@@ -84,7 +78,7 @@ const OrderScreen = () => {
 
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    const clientKey = 'SB-Mid-client-xMuaOFLhxcnaElJS';
+    const clientKey = client_key;
     const script = document.createElement('script');
     script.src = snapScript;
     script.setAttribute('data-client-key', clientKey);
@@ -95,7 +89,7 @@ const OrderScreen = () => {
     return () => {
       document.body.removeChild(script);
     };
-  }, []);
+  }, [client_key]);
 
   return isLoading ? (
     <Loader />
@@ -196,12 +190,6 @@ const OrderScreen = () => {
                   <Col>{formatRupiah(order.shippingPrice)}</Col>
                 </Row>
               </ListGroup.Item>
-              {/* <ListGroup.Item>
-                <Row>
-                  <Col>Tax</Col>
-                  <Col>{formatRupiah(order?.taxPrice || '')}</Col>
-                </Row>
-              </ListGroup.Item> */}
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
@@ -210,29 +198,9 @@ const OrderScreen = () => {
               </ListGroup.Item>
               {!order.isPaid && (
                 <ListGroup.Item>
-                  {/* {loadingPay && <Loader />} */}
-
-                  {isPending ? (
-                    <Loader />
-                  ) : (
-                    <div>
-                      {/* THIS BUTTON IS FOR TESTING! REMOVE BEFORE PRODUCTION! */}
-                      <Button
-                        style={{ marginBottom: '10px' }}
-                        onClick={onApprove}
-                      >
-                        Test Pay Order
-                      </Button>
-
-                      {/* <div>
-                        <PayPalButtons
-                          createOrder={createOrder}
-                          onApprove={onApprove}
-                          onError={onError}
-                        ></PayPalButtons>
-                      </div> */}
-                    </div>
-                  )}
+                  <Button style={{ marginBottom: '10px' }} onClick={onApprove}>
+                    Bayar
+                  </Button>
                 </ListGroup.Item>
               )}
 
