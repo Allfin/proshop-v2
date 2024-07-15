@@ -1,10 +1,12 @@
 import asyncHandler from '../middleware/asyncHandler.js';
-import mongoose from 'mongoose';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
 import { snap } from '../utils/midtrans.js';
+import dotenv from 'dotenv';
 // import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
+
+dotenv.config();
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -74,8 +76,10 @@ const getOrderById = asyncHandler(async (req, res) => {
     .populate('user', 'name email')
     .populate('orderItems.product', 'name image price');
 
+  const client_key = process.env.MD_CLIENT_KEY;
+
   if (order) {
-    res.json(order);
+    res.json({ order, client_key });
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -83,13 +87,11 @@ const getOrderById = asyncHandler(async (req, res) => {
 });
 
 // @desc    Update order to paid
-// @route   PUT /api/orders/:id/pay
+// @route   POST /api/orders/:id/
 // @access  Private
 const updateOrderToPaid = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const token = await snap.createTransactionToken(req.body);
-  console.log(token);
-  // res.json(token);
+  res.json({ token });
 });
 
 // @desc    Update order to delivered
@@ -112,12 +114,9 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
 });
 
 const payOrders = asyncHandler(async (req, res) => {
-  const token = await snap.createTransactionToken(req.body);
-  console.log('ini berisi token ' + token);
-
-  // const token = await snap.createTransactionToken(parameter);
-  // console.log(token);
-  // res.json(token);
+  console.log(req.body);
+  // const token = await snap.createTransactionToken(req.body);
+  // console.log('ini berisi token ' + token);
 });
 
 // @desc    Get all orders

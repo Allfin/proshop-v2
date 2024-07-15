@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { useSelector } from 'react-redux';
@@ -17,14 +17,12 @@ import { formatRupiah } from '../utils/price';
 const OrderScreen = () => {
   const { id: orderId } = useParams();
 
-  const {
-    data: order,
-    refetch,
-    isLoading,
-    error,
-  } = useGetOrderDetailsQuery(orderId);
+  const { data, refetch, isLoading, error } = useGetOrderDetailsQuery(orderId);
 
-  const [payOrder, { isLoading: loadingPay }] = usePayOrderMutation();
+  const { order, client_key } = data || {};
+
+  const [payOrder, { data: getToken, isLoading: loadingPay }] =
+    usePayOrderMutation();
 
   const [deliverOrder, { isLoading: loadingDeliver }] =
     useDeliverOrderMutation();
@@ -33,77 +31,71 @@ const OrderScreen = () => {
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
-  const {
-    data: paypal,
-    isLoading: loadingPayPal,
-    error: errorPayPal,
-  } = useGetPaypalClientIdQuery();
+  const onApprove = async () => {
+    try {
+      const res = await payOrder({
+        orderId,
+        details: {
+          transaction_details: {
+            order_id: order._id,
+            gross_amount: order.totalPrice,
+          },
 
-  useEffect(() => {
-    if (!errorPayPal && !loadingPayPal && paypal.clientId) {
-      const loadPaypalScript = async () => {
-        paypalDispatch({
-          type: 'resetOptions',
-          value: {
-            'client-id': paypal.clientId,
-            currency: 'USD',
+          customer_details: {
+            name: order.user.name,
+            email: order.user.email,
+          },
+        },
+      }).unwrap();
+
+      if (res && res.token) {
+        window.snap.pay(res.token, {
+          onSuccess: function (result) {
+            console.log('success');
+            console.log(result);
+          },
+          onPending: function (result) {
+            console.log('pending');
+            console.log(result);
+          },
+          onError: function (result) {
+            console.log('error');
+            console.log(result);
+          },
+          onClose: function () {
+            console.log(
+              'customer closed the popup without finishing the payment'
+            );
           },
         });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
-      };
-      if (order && !order.isPaid) {
-        if (!window.paypal) {
-          loadPaypalScript();
-        }
+        console.log(res.token);
+      } else {
+        console.log('Token tidak tersedia dalam respons');
       }
-    }
-  }, [errorPayPal, loadingPayPal, order, paypal, paypalDispatch]);
-
-  const onApprove = async (data, actions) => {
-    const parameter = {
-      item_details: {
-        name: 'Kain ulos',
-        price: order.itemsPrice,
-        quantity: 2,
-      },
-      transaction_details: {
-        order_id: 1,
-        gross_amount: order.totalPrice,
-      },
-    };
-    try {
-      const result = await payOrder({
-        orderId,
-        details: parameter,
-      }).unwrap();
-      console.log('Berhasil bayar', result);
     } catch (error) {
       console.log('Gagal bayar', error);
     }
   };
 
-  function onError(err) {
-    toast.error(err.message);
-  }
-
-  function createOrder(data, actions) {
-    return actions.order
-      .create({
-        purchase_units: [
-          {
-            amount: { value: order.totalPrice },
-          },
-        ],
-      })
-      .then((orderID) => {
-        return orderID;
-      });
-  }
-
   const deliverHandler = async () => {
     await deliverOrder(orderId);
     refetch();
   };
+
+  useEffect(() => {
+    const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    const clientKey = 'SB-Mid-client-xMuaOFLhxcnaElJS';
+    const script = document.createElement('script');
+    script.src = snapScript;
+    script.setAttribute('data-client-key', clientKey);
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return isLoading ? (
     <Loader />
@@ -204,12 +196,12 @@ const OrderScreen = () => {
                   <Col>{formatRupiah(order.shippingPrice)}</Col>
                 </Row>
               </ListGroup.Item>
-              <ListGroup.Item>
+              {/* <ListGroup.Item>
                 <Row>
                   <Col>Tax</Col>
                   <Col>{formatRupiah(order?.taxPrice || '')}</Col>
                 </Row>
-              </ListGroup.Item>
+              </ListGroup.Item> */}
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
@@ -218,7 +210,7 @@ const OrderScreen = () => {
               </ListGroup.Item>
               {!order.isPaid && (
                 <ListGroup.Item>
-                  {loadingPay && <Loader />}
+                  {/* {loadingPay && <Loader />} */}
 
                   {isPending ? (
                     <Loader />
@@ -232,13 +224,13 @@ const OrderScreen = () => {
                         Test Pay Order
                       </Button>
 
-                      <div>
+                      {/* <div>
                         <PayPalButtons
                           createOrder={createOrder}
                           onApprove={onApprove}
                           onError={onError}
                         ></PayPalButtons>
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </ListGroup.Item>
