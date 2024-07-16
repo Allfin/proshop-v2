@@ -1,6 +1,5 @@
 import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import Rating from './Rating';
 import { formatRupiah } from '../utils/price';
 
 const Product = ({ product }) => {
@@ -16,14 +15,7 @@ const Product = ({ product }) => {
           </Card.Title>
         </Link>
 
-        {/* <Card.Text as='div'>
-          <Rating
-            value={product.rating}
-            text={`${product.numReviews} reviews`}
-          />
-        </Card.Text> */}
-
-        <Card.Text as='h3'>Rp {formatRupiah(product.price)}</Card.Text>
+        <Card.Text as='h3'>{formatRupiah(product.price)}</Card.Text>
       </Card.Body>
     </Card>
   );
