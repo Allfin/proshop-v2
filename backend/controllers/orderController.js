@@ -1,9 +1,11 @@
+import axios from 'axios';
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
 import { snap } from '../utils/midtrans.js';
 import dotenv from 'dotenv';
+import { updatePayment } from '../utils/updateDatabase.js';
 // import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
 
 dotenv.config();
@@ -86,12 +88,38 @@ const getOrderById = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update order to paid
+// @desc    Paid order
 // @route   POST /api/orders/:id/
 // @access  Private
-const updateOrderToPaid = asyncHandler(async (req, res) => {
+const createTransaction = asyncHandler(async (req, res) => {
   const token = await snap.createTransactionToken(req.body);
   res.json({ token });
+});
+
+// @desc    Update order to paid
+// @route   GET /api/orders/:id/thanks/?order_id
+// @access  Private
+const getTransactions = asyncHandler(async (req, res) => {});
+
+const getTransactionsById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  console.log(typeof id);
+  try {
+    const response = await snap.transaction.status(id).then((res) => {
+      if (res.transaction_status === 'settlement') {
+        updatePayment(id);
+      } else {
+        console.log('gagal');
+      }
+    });
+    // Handle other data as needed
+
+    return response; // Mengembalikan respons untuk penggunaan lebih lanjut
+  } catch (error) {
+    console.error('Error checking payment status:', error);
+    throw error; // Melempar error untuk penanganan lebih lanjut
+  }
 });
 
 // @desc    Update order to delivered
@@ -113,12 +141,6 @@ const updateOrderToDelivered = asyncHandler(async (req, res) => {
   }
 });
 
-const payOrders = asyncHandler(async (req, res) => {
-  console.log(req.body);
-  // const token = await snap.createTransactionToken(req.body);
-  // console.log('ini berisi token ' + token);
-});
-
 // @desc    Get all orders
 // @route   GET /api/orders
 // @access  Private/Admin
@@ -131,8 +153,9 @@ export {
   addOrderItems,
   getMyOrders,
   getOrderById,
-  updateOrderToPaid,
+  getTransactions,
+  getTransactionsById,
   updateOrderToDelivered,
-  payOrders,
+  createTransaction,
   getOrders,
 };

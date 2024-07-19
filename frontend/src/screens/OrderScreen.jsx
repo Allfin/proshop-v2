@@ -34,35 +34,18 @@ const OrderScreen = () => {
             order_id: order._id,
             gross_amount: order.totalPrice,
           },
-
           customer_details: {
             name: order.user.name,
             email: order.user.email,
+          },
+          callbacks: {
+            finish: `/thanks`,
           },
         },
       }).unwrap();
 
       if (res && res.token) {
-        window.snap.pay(res.token, {
-          onSuccess: function (result) {
-            console.log('success');
-            console.log(result);
-          },
-          onPending: function (result) {
-            console.log('pending');
-            console.log(result);
-          },
-          onError: function (result) {
-            console.log('error');
-            console.log(result);
-          },
-          onClose: function () {
-            console.log(
-              'customer closed the popup without finishing the payment'
-            );
-          },
-        });
-        console.log(res.token);
+        window.snap.pay(res.token);
       } else {
         console.log('Token tidak tersedia dalam respons');
       }
