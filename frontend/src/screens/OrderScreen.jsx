@@ -18,6 +18,8 @@ const OrderScreen = () => {
 
   const { order, client_key } = data || {};
 
+  console.log(order);
+
   const [payOrder] = usePayOrderMutation();
 
   const [deliverOrder, { isLoading: loadingDeliver }] =
@@ -87,7 +89,7 @@ const OrderScreen = () => {
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
-                <strong>Name: </strong> {order.user.name}
+                <strong>Name: </strong> {console.log(order.user)}
               </p>
               <p>
                 <strong>Email: </strong>{' '}

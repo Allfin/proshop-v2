@@ -11,7 +11,10 @@ export const updatePayment = async (order_id) => {
     }
 
     // Mengubah status pembayaran
-    order.isPaid = true;
+    order = {
+      isPaid: true,
+      paidAt: new Date(),
+    };
 
     // Menyimpan perubahan ke database
     const updatedOrder = await order.save();
