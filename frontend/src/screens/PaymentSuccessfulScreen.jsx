@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { useUpdateTransactionQuery } from '../slices/ordersApiSlice';
 
@@ -8,8 +8,7 @@ const PaymentSuccessful = () => {
   const query = useQuery();
   const orderId = query.get('order_id');
 
-  const { data, refetch, isLoading, error } =
-    useUpdateTransactionQuery(orderId);
+  const { data } = useUpdateTransactionQuery(orderId);
 
   return <div>Terima Kasih Pembayaran {data}</div>;
 };

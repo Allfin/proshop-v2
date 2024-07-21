@@ -104,18 +104,31 @@ const getTransactions = asyncHandler(async (req, res) => {});
 const getTransactionsById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  console.log(typeof id);
+  console.log(id);
   try {
-    const response = await snap.transaction.status(id).then((res) => {
-      if (res.transaction_status === 'settlement') {
-        updatePayment(id);
-      } else {
-        console.log('gagal');
-      }
-    });
-    // Handle other data as needed
+    const filter = { _id: response.order_id }; // Filter berdasarkan order ID
+    const update = {
+      isPaid: true,
+      paidAt: new Date(),
+      paymentResult: response, // Menambahkan objek baru `paymentResult`
+    };
 
-    return response; // Mengembalikan respons untuk penggunaan lebih lanjut
+    const updatedOrder = await Order.findOneAndUpdate(filter, update, {
+      new: true,
+      upsert: true, // Membuat dokumen baru jika tidak ditemukan
+      runValidators: true, // Menjalankan validator pada update
+    });
+    if (updatedOrder) {
+      res.status(200).json({ success: true, order: updatedOrder });
+    } else {
+      console.log('Order tidak ditemukan dan gagal di-upsert');
+      res
+        .status(404)
+        .json({
+          success: false,
+          message: 'Order tidak ditemukan dan gagal di-upsert',
+        });
+    }
   } catch (error) {
     console.error('Error checking payment status:', error);
     throw error; // Melempar error untuk penanganan lebih lanjut
