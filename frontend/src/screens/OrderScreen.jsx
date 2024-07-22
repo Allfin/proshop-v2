@@ -10,6 +10,7 @@ import {
   usePayOrderMutation,
 } from '../slices/ordersApiSlice';
 import { formatRupiah } from '../utils/price';
+import moment from 'moment';
 
 const OrderScreen = () => {
   const { id: orderId } = useParams();
@@ -117,7 +118,9 @@ const OrderScreen = () => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
+                <Message variant='success'>
+                  Paid {moment(order.paidAt).startOf('day').fromNow()}
+                </Message>
               ) : (
                 <Message variant='danger'>Not Paid</Message>
               )}

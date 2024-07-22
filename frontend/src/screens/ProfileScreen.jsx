@@ -10,6 +10,7 @@ import { useProfileMutation } from '../slices/usersApiSlice';
 import { useGetMyOrdersQuery } from '../slices/ordersApiSlice';
 import { setCredentials } from '../slices/authSlice';
 import { Link } from 'react-router-dom';
+import moment from 'moment';
 
 const ProfileScreen = () => {
   const [name, setName] = useState('');
@@ -112,7 +113,7 @@ const ProfileScreen = () => {
           <Message variant='danger'>
             {error?.data?.message || error.error}
           </Message>
-        ) : (
+        ) : orders && orders.length > 0 ? (
           <Table striped hover responsive className='table-sm'>
             <thead>
               <tr>
@@ -132,14 +133,14 @@ const ProfileScreen = () => {
                   <td>{order.totalPrice}</td>
                   <td>
                     {order.isPaid ? (
-                      order.paidAt.substring(0, 10)
+                      moment(order.paidAt).format('DD/MM/YYYY')
                     ) : (
                       <FaTimes style={{ color: 'red' }} />
                     )}
                   </td>
                   <td>
                     {order.isDelivered ? (
-                      order.deliveredAt.substring(0, 10)
+                      moment(order.deliveredAt).format('DD/MM/YYYY')
                     ) : (
                       <FaTimes style={{ color: 'red' }} />
                     )}
@@ -158,6 +159,8 @@ const ProfileScreen = () => {
               ))}
             </tbody>
           </Table>
+        ) : (
+          <Message variant='info'>No orders found</Message>
         )}
       </Col>
     </Row>
