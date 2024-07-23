@@ -22,7 +22,7 @@ const getCity = asyncHandler(async (req, res) => {
       headers: { key: process.env.KEY_ONGKIR },
     });
     const data = await response.json();
-    res.json(data);
+    res.json(data.rajaongkir.results);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
