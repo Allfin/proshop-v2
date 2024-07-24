@@ -9,7 +9,13 @@ export const shippingSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    getCity: builder.query({
+      query: (id) => ({
+        url: `${RAJAONGKIR_URL}/city/${id}`,
+      }),
+      keepUnusedDataFor: 5,
+    }),
   }),
 });
 
-export const { useGetProvinceQuery } = shippingSlice;
+export const { useGetProvinceQuery, useGetCityQuery } = shippingSlice;

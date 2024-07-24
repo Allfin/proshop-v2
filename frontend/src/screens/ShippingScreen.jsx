@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { saveShippingDetails } from '../slices/cartSlice';
-import { useGetProvinceQuery } from '../slices/shippingSlice';
-import Loader from '../components/Loader';
+import { useGetCityQuery, useGetProvinceQuery } from '../slices/shippingSlice';
 
 const ShippingScreen = () => {
   // catatan yang dihapus
@@ -16,110 +15,177 @@ const ShippingScreen = () => {
   // 3. payment method
   // 4. tax price
 
-  const { data: provinceList, isLoading, error } = useGetProvinceQuery();
-
   const cart = useSelector((state) => state.cart);
   const { shippingDetails } = cart;
 
-  const [address, setAddress] = useState(shippingDetails?.address || '');
-  const [selectedProvince, setSelectedProvince] = useState('');
-  const [recipientName, setRecipientName] = useState(
-    shippingDetails?.recipientName || ''
-  );
-  const [curierNote, setCurierNote] = useState(
-    shippingDetails?.curierNote || ''
-  );
-  const [numberPhone, setNumberPhone] = useState(
-    shippingDetails?.numberPhone || ''
+  const [formData, setFormData] = useState({
+    addres: shippingDetails?.address || null,
+    selectedProvince: '',
+    selectedCity: '',
+    recipientName: shippingDetails?.recipientName || '',
+    curierNote: shippingDetails?.curierNote || '',
+    numberPhone: shippingDetails?.numberPhone || '',
+  });
+
+  const [validated, setValidated] = useState(false);
+
+  // Get list data province
+  const { data: provinceList, isLoading, error } = useGetProvinceQuery();
+
+  // Get list data city by id province
+  const { data: cityList, isLoading: cityLoading } = useGetCityQuery(
+    formData.selectedProvince
   );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    dispatch(
-      saveShippingDetails({
-        address,
-        selectedProvince,
-        recipientName,
-        curierNote,
-        numberPhone,
-      })
-    );
-    navigate('/payment');
+  const handleChangeForm = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const submitHandler = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.stopPropagation();
+    } else {
+      dispatch(
+        saveShippingDetails({
+          address: formData.address,
+          selectedProvince: formData.selectedProvince,
+          selectedCity: formData.selectedCity,
+          recipientName: formData.recipientName,
+          curierNote: formData.curierNote,
+          numberPhone: formData.numberPhone,
+        })
+      );
+      navigate('/payment');
+    }
+    setValidated(true);
   };
 
   return (
     <FormContainer>
       <CheckoutSteps step1 step2 />
       <h1>Shipping</h1>
-      <Form.Group className='my-2' controlId='recipientName'>
-        <Form.Label>Nama Penerima</Form.Label>
-        <Form.Control
-          type='text'
-          placeholder='Masukan nama penerima'
-          value={recipientName}
-          required
-          onChange={(e) => setRecipientName(e.target.value)}
-        ></Form.Control>
-      </Form.Group>
+      <Form onSubmit={submitHandler} noValidate validated={validated}>
+        <Form.Group className='my-2' controlId='validationCustom01'>
+          <Form.Label>Nama Penerima</Form.Label>
+          <InputGroup hasValidation>
+            <Form.Control
+              type='text'
+              name='recipientName'
+              placeholder='Masukan nama penerima'
+              value={formData.recipientName}
+              required
+              onChange={handleChangeForm}
+            ></Form.Control>
+            <Form.Control.Feedback type='invalid'>
+              Masukan Nama Penerima
+            </Form.Control.Feedback>
+          </InputGroup>
+        </Form.Group>
 
-      <Form.Group className='my-2' controlId='numberPhone'>
-        <Form.Label>Nomor Hp</Form.Label>
-        <Form.Control
-          type='text'
-          placeholder='Enter numberPhone'
-          value={numberPhone}
-          required
-          onChange={(e) => setNumberPhone(e.target.value)}
-        ></Form.Control>
-      </Form.Group>
+        <Form.Group className='my-2' controlId='numberPhone'>
+          <Form.Label>Nomor Hp</Form.Label>
+          <Form.Control
+            type='text'
+            name='numberPhone'
+            placeholder='Enter numberPhone'
+            value={formData.numberPhone}
+            required
+            onChange={handleChangeForm}
+          ></Form.Control>
+          <Form.Control.Feedback type='invalid'>
+            Masukan Nomor Telepon
+          </Form.Control.Feedback>
+        </Form.Group>
 
-      <Form.Group className='my-2' controlId='province'>
-        <Form.Label>Provinsi</Form.Label>
-        <Form.Select
-          aria-label='Default select example'
-          onChange={(e) => setSelectedProvince(e.target.value)}
-          value={selectedProvince}
-        >
-          <option selected disabled>
-            Open this select menu
-          </option>
-          {isLoading ? (
-            <option disabled>Loading...</option>
-          ) : (
-            provinceList.map((provinceData) => (
-              <option
-                key={provinceData.province_id}
-                value={provinceData.province_id}
-              >
-                {provinceData.province}
-              </option>
-            ))
-          )}
-        </Form.Select>
-      </Form.Group>
+        <Form.Group className='my-2' controlId='province'>
+          <Form.Label>Provinsi</Form.Label>
+          <Form.Select
+            aria-label='Default select example'
+            onChange={handleChangeForm}
+            name='selectedProvince'
+            value={formData.selectedProvince}
+            required
+          >
+            <option value='' disabled>
+              Open this select menu
+            </option>
+            {isLoading ? (
+              <option disabled>Loading...</option>
+            ) : (
+              provinceList.map((provinceData) => (
+                <option
+                  key={provinceData.province_id}
+                  value={provinceData.province_id}
+                >
+                  {provinceData.province}
+                </option>
+              ))
+            )}
+          </Form.Select>
+          <Form.Control.Feedback type='invalid'>
+            Pilih Provinsi Tujuan
+          </Form.Control.Feedback>
+        </Form.Group>
 
-      <Form onSubmit={submitHandler}>
+        <Form.Group className='my-2' controlId='City'>
+          <Form.Label>Kota</Form.Label>
+          <Form.Select
+            aria-label='Default select example'
+            name='selectedCity'
+            required
+            onChange={handleChangeForm}
+            value={formData.selectedCity}
+          >
+            <option value='' disabled>
+              Open this select menu
+            </option>
+            {!cityList ? (
+              <option disabled>Pilih provinsi terlebih dahulu...</option>
+            ) : (
+              cityList.map((cityData) => (
+                <option key={cityData.city_id} value={cityData.city_id}>
+                  {cityData.city_name}
+                </option>
+              ))
+            )}
+          </Form.Select>
+          <Form.Control.Feedback type='invalid'>
+            Pilih Kota Tujuan
+          </Form.Control.Feedback>
+        </Form.Group>
+
         <Form.Group className='my-2' controlId='address'>
           <Form.Label>Alamat Lengkap</Form.Label>
           <Form.Control
             type='text'
+            name='address'
             placeholder='masukan alamat lengkap'
-            value={address}
+            value={formData.address}
             required
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={handleChangeForm}
           ></Form.Control>
+          <Form.Control.Feedback type='invalid'>
+            Masukan Alamat Lengkap
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className='my-2' controlId='curierNote'>
           <Form.Label>Catatan Untuk Kuri (Opsional)</Form.Label>
           <Form.Control
             type='text'
+            name='curierNote'
             placeholder='Catatan untuk kurir'
-            value={curierNote}
-            onChange={(e) => setCurierNote(e.target.value)}
+            value={formData.curierNote}
+            onChange={handleChangeForm}
           ></Form.Control>
         </Form.Group>
 
