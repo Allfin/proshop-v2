@@ -18,7 +18,6 @@ const OrderScreen = () => {
   const { data, refetch, isLoading, error } = useGetOrderDetailsQuery(orderId);
 
   const { order, client_key } = data || {};
-
   console.log(order);
 
   const [payOrder] = usePayOrderMutation();
@@ -62,6 +61,10 @@ const OrderScreen = () => {
     refetch();
   };
 
+  const totalPriceUnit = (qty, price) => {
+    return price * qty;
+  };
+
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
     const clientKey = client_key;
@@ -90,7 +93,7 @@ const OrderScreen = () => {
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
-                <strong>Name: </strong> {console.log(order.user)}
+                <strong>Name: {order.user.name}</strong>{' '}
               </p>
               <p>
                 <strong>Email: </strong>{' '}
@@ -149,8 +152,10 @@ const OrderScreen = () => {
                           </Link>
                         </Col>
                         <Col md={4}>
-                          {item.qty} x {formatRupiah(item.price)} =
-                          {formatRupiah(item.qty * item.price)}
+                          {item.qty} x {formatRupiah(item.product.price)} =
+                          {formatRupiah(
+                            totalPriceUnit(item.qty, item.product.price)
+                          )}
                         </Col>
                       </Row>
                     </ListGroup.Item>

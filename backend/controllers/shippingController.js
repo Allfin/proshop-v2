@@ -28,4 +28,28 @@ const getCity = asyncHandler(async (req, res) => {
   }
 });
 
-export { getProvince, getCity };
+const getCost = asyncHandler(async (req, res) => {
+  const { origin, destination, weight, courier } = req.body;
+  console.log(typeof weight);
+  try {
+    const response = await fetch(`${url}/cost`, {
+      method: 'POST',
+      headers: {
+        key: process.env.KEY_ONGKIR,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        origin,
+        destination,
+        weight,
+        courier,
+      }),
+    });
+    const data = await response.json();
+    res.json(data.rajaongkir.results[0].costs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+export { getProvince, getCity, getCost };

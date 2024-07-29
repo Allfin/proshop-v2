@@ -10,7 +10,8 @@ const PaymentSuccessful = () => {
 
   const { data } = useUpdateTransactionQuery(orderId);
 
-  return <div>Terima Kasih Pembayaran {data}</div>;
+  console.log(data);
+  return <div>Terima Kasih Pembayaran</div>;
 };
 
 export default PaymentSuccessful;

@@ -15,7 +15,16 @@ export const shippingSlice = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 5,
     }),
+    getCost: builder.mutation({
+      query: ({ body }) => ({
+        method: 'POST',
+        url: `${RAJAONGKIR_URL}/cost`,
+        body,
+      }),
+      keepUnusedDataFor: 5,
+    }),
   }),
 });
 
-export const { useGetProvinceQuery, useGetCityQuery } = shippingSlice;
+export const { useGetProvinceQuery, useGetCityQuery, useGetCostMutation } =
+  shippingSlice;

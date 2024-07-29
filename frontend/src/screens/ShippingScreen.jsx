@@ -1,11 +1,16 @@
-import { useState } from 'react';
-import { Form, Button, InputGroup } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Form, Button, InputGroup, Card, ListGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { saveShippingDetails } from '../slices/cartSlice';
-import { useGetCityQuery, useGetProvinceQuery } from '../slices/shippingSlice';
+import {
+  useGetCityQuery,
+  useGetCostMutation,
+  useGetProvinceQuery,
+} from '../slices/shippingSlice';
+import { formatRupiah } from '../utils/price';
 
 const ShippingScreen = () => {
   // catatan yang dihapus
@@ -19,13 +24,16 @@ const ShippingScreen = () => {
   const { shippingDetails } = cart;
 
   const [formData, setFormData] = useState({
-    addres: shippingDetails?.address || null,
-    selectedProvince: '',
-    selectedCity: '',
+    addres: shippingDetails?.address || '',
+    selectedProvince: shippingDetails?.selectedProvince || '',
+    selectedCity: shippingDetails?.selectedCity || '',
     recipientName: shippingDetails?.recipientName || '',
     curierNote: shippingDetails?.curierNote || '',
     numberPhone: shippingDetails?.numberPhone || '',
+    costDelivery: shippingDetails?.costDelivery || '',
   });
+
+  const [deliveryList, setDeliveryList] = useState(null);
 
   const [validated, setValidated] = useState(false);
 
@@ -37,6 +45,30 @@ const ShippingScreen = () => {
     formData.selectedProvince
   );
 
+  const [getCost, { isLoading: costLoading }] = useGetCostMutation();
+
+  const costDeliveryList = async () => {
+    try {
+      const response = await getCost({
+        body: {
+          origin: '1',
+          destination: '1',
+          weight: 1,
+          courier: 'jne',
+        },
+      }).unwrap();
+      setDeliveryList(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (formData.selectedCity) {
+      costDeliveryList();
+    }
+  }, [formData.selectedCity]);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -47,6 +79,7 @@ const ShippingScreen = () => {
       [name]: value,
     });
   };
+  console.log(formData.costDelivery);
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -62,6 +95,9 @@ const ShippingScreen = () => {
           recipientName: formData.recipientName,
           curierNote: formData.curierNote,
           numberPhone: formData.numberPhone,
+          costDelivery: formData.costDelivery,
+          totalPrice:
+            parseInt(formData.costDelivery, 10) + parseInt(cart.itemsPrice, 10),
         })
       );
       navigate('/payment');
@@ -150,6 +186,8 @@ const ShippingScreen = () => {
             </option>
             {!cityList ? (
               <option disabled>Pilih provinsi terlebih dahulu...</option>
+            ) : cityLoading ? (
+              <option disabled>Loading...</option>
             ) : (
               cityList.map((cityData) => (
                 <option key={cityData.city_id} value={cityData.city_id}>
@@ -187,6 +225,39 @@ const ShippingScreen = () => {
             value={formData.curierNote}
             onChange={handleChangeForm}
           ></Form.Control>
+        </Form.Group>
+
+        <Form.Group className='my-2' controlId='City'>
+          <Form.Label>Pilih Pengiriman</Form.Label>
+          <Form.Select
+            aria-label='Default select example'
+            name='costDelivery'
+            required
+            onChange={handleChangeForm}
+            value={formData.costDelivery}
+          >
+            <option value='' disabled>
+              Open this select menu
+            </option>
+            {!deliveryList ? (
+              <option disabled>Pilih provinsi terlebih dahulu...</option>
+            ) : costLoading ? (
+              <option disabled>Loading...</option>
+            ) : (
+              deliveryList.map((delivery) => (
+                <optgroup label={delivery.description}>
+                  {delivery.cost.map((cost) => (
+                    <option value={cost.value}>{`${formatRupiah(
+                      cost.value
+                    )} / ${cost.etd} hari`}</option>
+                  ))}
+                </optgroup>
+              ))
+            )}
+          </Form.Select>
+          <Form.Control.Feedback type='invalid'>
+            Pilih Kota Tujuan
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Button type='submit' variant='success'>

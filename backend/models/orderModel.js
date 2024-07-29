@@ -2,16 +2,10 @@ import mongoose from 'mongoose';
 
 const orderSchema = mongoose.Schema(
   {
-    snap_token: {
-      type: String,
-    },
     snap_redirect_url: {
       type: String,
     },
     payment_method: {
-      type: String,
-    },
-    snap_token: {
       type: String,
     },
     user: {

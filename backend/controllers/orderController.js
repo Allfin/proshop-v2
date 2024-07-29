@@ -15,6 +15,7 @@ dotenv.config();
 // @access  Private
 const addOrderItems = asyncHandler(async (req, res) => {
   const { orderItems, shippingDetails, paymentMethod } = req.body;
+  console.log(shippingDetails);
 
   if (orderItems && orderItems.length === 0) {
     res.status(400);
@@ -52,8 +53,8 @@ const addOrderItems = asyncHandler(async (req, res) => {
       shippingDetails,
       paymentMethod,
       itemsPrice,
-      shippingPrice,
-      totalPrice,
+      shippingPrice: shippingDetails.costDelivery,
+      totalPrice: shippingDetails.totalPrice,
     });
 
     const createdOrder = await order.save();
@@ -102,36 +103,18 @@ const createTransaction = asyncHandler(async (req, res) => {
 const getTransactions = asyncHandler(async (req, res) => {});
 
 const getTransactionsById = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const order = await Order.findById(req.params.id);
 
-  console.log(id);
-  try {
-    const filter = { _id: response.order_id }; // Filter berdasarkan order ID
-    const update = {
-      isPaid: true,
-      paidAt: new Date(),
-      paymentResult: response, // Menambahkan objek baru `paymentResult`
-    };
+  if (order) {
+    order.isPaid = true;
+    order.paidAt = Date.now();
 
-    const updatedOrder = await Order.findOneAndUpdate(filter, update, {
-      new: true,
-      upsert: true, // Membuat dokumen baru jika tidak ditemukan
-      runValidators: true, // Menjalankan validator pada update
-    });
-    if (updatedOrder) {
-      res.status(200).json({ success: true, order: updatedOrder });
-    } else {
-      console.log('Order tidak ditemukan dan gagal di-upsert');
-      res
-        .status(404)
-        .json({
-          success: false,
-          message: 'Order tidak ditemukan dan gagal di-upsert',
-        });
-    }
-  } catch (error) {
-    console.error('Error checking payment status:', error);
-    throw error; // Melempar error untuk penanganan lebih lanjut
+    const updatedOrder = await order.save();
+
+    res.json(updatedOrder);
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
   }
 });
 

@@ -34,9 +34,9 @@ const PlaceOrderScreen = () => {
         userId: auth.userInfo._id,
         shippingDetails: cart.shippingDetails,
         paymentMethod: cart.paymentMethod,
-        itemsPrice: cart.itemsPrice,
-        shippingPrice: cart.shippingPrice,
-        totalPrice: cart.totalPrice,
+        itemsPrice: cart.itemPrice,
+        shippingPrice: cart.shippingDetails.shippingPrice,
+        totalPrice: cart.shippingDetails.totalPrice,
       }).unwrap();
       dispatch(clearCartItems());
       navigate(`/order/${res._id}`);
@@ -116,13 +116,13 @@ const PlaceOrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Shipping</Col>
-                  <Col>{formatRupiah(cart.shippingPrice)}</Col>
+                  <Col>{formatRupiah(cart.shippingDetails.costDelivery)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
-                  <Col>{formatRupiah(cart.totalPrice)}</Col>
+                  <Col>{formatRupiah(cart.shippingDetails.totalPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
