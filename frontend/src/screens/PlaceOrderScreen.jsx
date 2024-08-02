@@ -33,7 +33,6 @@ const PlaceOrderScreen = () => {
         orderItems: cart.cartItems,
         userId: auth.userInfo._id,
         shippingDetails: cart.shippingDetails,
-        paymentMethod: cart.paymentMethod,
         itemsPrice: cart.itemPrice,
         shippingPrice: cart.shippingDetails.shippingPrice,
         totalPrice: cart.shippingDetails.totalPrice,

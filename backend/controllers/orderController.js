@@ -1,12 +1,8 @@
-import axios from 'axios';
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
-import { calcPrices } from '../utils/calcPrices.js';
 import { snap } from '../utils/midtrans.js';
 import dotenv from 'dotenv';
-import { updatePayment } from '../utils/updateDatabase.js';
-// import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
 
 dotenv.config();
 
@@ -14,8 +10,7 @@ dotenv.config();
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = asyncHandler(async (req, res) => {
-  const { orderItems, shippingDetails, paymentMethod } = req.body;
-  console.log(shippingDetails);
+  const { orderItems, shippingDetails, totalPrice, shippingPrice } = req.body;
 
   if (orderItems && orderItems.length === 0) {
     res.status(400);
@@ -44,17 +39,13 @@ const addOrderItems = asyncHandler(async (req, res) => {
       };
     });
 
-    // calculate prices
-    const { itemsPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
-
     const order = new Order({
       orderItems: dbOrderItems,
       user: req.body.userId,
       shippingDetails,
-      paymentMethod,
-      itemsPrice,
-      shippingPrice: shippingDetails.costDelivery,
-      totalPrice: shippingDetails.totalPrice,
+      itemsPrice: dbOrderItems.itemsPrice,
+      shippingPrice,
+      totalPrice,
     });
 
     const createdOrder = await order.save();
@@ -154,4 +145,36 @@ export {
   updateOrderToDelivered,
   createTransaction,
   getOrders,
+};
+
+const product = {
+  orderItems: [
+    {
+      _id: '66a74c21a6f992036ccf308a',
+      name: 'iPhone 13 Pro 256GB Memory',
+      image: '/images/phone.jpg',
+      brand: 'Apple',
+      description:
+        'Introducing the iPhone 13 Pro. A transformative triple-camera system that adds tons of capability without complexity. An unprecedented leap in battery life',
+      price: 200000,
+      countInStock: 7,
+      __v: 0,
+      createdAt: '2024-07-29T08:00:33.429Z',
+      updatedAt: '2024-07-29T08:00:33.429Z',
+      qty: 1,
+    },
+  ],
+  userId: '66a74c21a6f992036ccf3086',
+  shippingDetails: {
+    address:
+      'Jln.Janti, Gg.Ontoseno, RT/TW.04/09, No.92B, Karangjambe, Banguntapan, Bantul DIY',
+    selectedProvince: '5',
+    selectedCity: '39',
+    recipientName: 'All fine Maulinaro',
+    curierNote: '',
+    numberPhone: '085374169758',
+    costDelivery: '20000',
+    totalPrice: 220000,
+  },
+  totalPrice: 220000,
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Form, Button, InputGroup, Card, ListGroup } from 'react-bootstrap';
+import { Form, Button, InputGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
@@ -13,13 +13,6 @@ import {
 import { formatRupiah } from '../utils/price';
 
 const ShippingScreen = () => {
-  // catatan yang dihapus
-  // ---- Order ----
-  // 1. postal kode => kurir note
-  // 2. numberPhone => number phone
-  // 3. payment method
-  // 4. tax price
-
   const cart = useSelector((state) => state.cart);
   const { shippingDetails } = cart;
 
@@ -30,15 +23,14 @@ const ShippingScreen = () => {
     recipientName: shippingDetails?.recipientName || '',
     curierNote: shippingDetails?.curierNote || '',
     numberPhone: shippingDetails?.numberPhone || '',
-    costDelivery: shippingDetails?.costDelivery || '',
+    shippingPrice: shippingDetails?.shippingPrice || '',
   });
 
   const [deliveryList, setDeliveryList] = useState(null);
-
   const [validated, setValidated] = useState(false);
 
   // Get list data province
-  const { data: provinceList, isLoading, error } = useGetProvinceQuery();
+  const { data: provinceList, isLoading } = useGetProvinceQuery();
 
   // Get list data city by id province
   const { data: cityList, isLoading: cityLoading } = useGetCityQuery(
@@ -46,28 +38,6 @@ const ShippingScreen = () => {
   );
 
   const [getCost, { isLoading: costLoading }] = useGetCostMutation();
-
-  const costDeliveryList = async () => {
-    try {
-      const response = await getCost({
-        body: {
-          origin: '1',
-          destination: '1',
-          weight: 1,
-          courier: 'jne',
-        },
-      }).unwrap();
-      setDeliveryList(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    if (formData.selectedCity) {
-      costDeliveryList();
-    }
-  }, [formData.selectedCity]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,7 +49,6 @@ const ShippingScreen = () => {
       [name]: value,
     });
   };
-  console.log(formData.costDelivery);
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -95,15 +64,38 @@ const ShippingScreen = () => {
           recipientName: formData.recipientName,
           curierNote: formData.curierNote,
           numberPhone: formData.numberPhone,
-          costDelivery: formData.costDelivery,
+          shippingPrice: formData.shippingPrice,
           totalPrice:
-            parseInt(formData.costDelivery, 10) + parseInt(cart.itemsPrice, 10),
+            parseInt(formData.shippingPrice, 10) +
+            parseInt(cart.itemsPrice, 10),
         })
       );
       navigate('/payment');
     }
     setValidated(true);
   };
+
+  useEffect(() => {
+    const costDeliveryList = async () => {
+      try {
+        const response = await getCost({
+          body: {
+            origin: '1',
+            destination: '1',
+            weight: 1,
+            courier: 'jne',
+          },
+        }).unwrap();
+        setDeliveryList(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    return () => {
+      costDeliveryList();
+    };
+  }, [formData.setDeliveryList, getCost]);
 
   return (
     <FormContainer>
@@ -231,10 +223,10 @@ const ShippingScreen = () => {
           <Form.Label>Pilih Pengiriman</Form.Label>
           <Form.Select
             aria-label='Default select example'
-            name='costDelivery'
+            name='shippingPrice'
             required
             onChange={handleChangeForm}
-            value={formData.costDelivery}
+            value={formData.shippingPrice}
           >
             <option value='' disabled>
               Open this select menu
