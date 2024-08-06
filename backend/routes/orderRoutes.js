@@ -7,7 +7,7 @@ import {
   updateOrderToDelivered,
   getOrders,
   createTransaction,
-  getTransactionsById,
+  getUpdatePayOrder,
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -17,7 +17,7 @@ router
   .route('/:id')
   .get(protect, getOrderById)
   .post(protect, createTransaction);
-router.route('/:id/thanks').get(protect, getTransactionsById);
+router.route('/:id/thanks').get(protect, getUpdatePayOrder);
 router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
 
 export default router;

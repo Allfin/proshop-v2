@@ -2,12 +2,14 @@ import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Button, Row, Col, ListGroup, Image, Card } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
 import Loader from '../components/Loader';
-import { useCreateOrderMutation } from '../slices/ordersApiSlice';
-import { clearCartItems } from '../slices/cartSlice';
+import {
+  useCreateOrderMutation,
+  usePayOrderMutation,
+} from '../slices/ordersApiSlice';
 import { formatRupiah } from '../utils/price';
 
 const PlaceOrderScreen = () => {
@@ -17,6 +19,7 @@ const PlaceOrderScreen = () => {
   const auth = useSelector((state) => state.auth);
 
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
+  const [payOrder] = usePayOrderMutation();
 
   useEffect(() => {
     if (!cart.shippingDetails.address) {
@@ -24,12 +27,25 @@ const PlaceOrderScreen = () => {
     } else if (!cart.paymentMethod) {
       navigate('/payment');
     }
+
+    const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
+    const script = document.createElement('script');
+    const clientKey = 'SB-Mid-client-xMuaOFLhxcnaElJS';
+    script.src = snapScript;
+    script.setAttribute('data-client-key', clientKey);
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, [cart.paymentMethod, cart.shippingDetails.address, navigate]);
 
-  const dispatch = useDispatch();
   const placeOrderHandler = async () => {
     try {
-      const res = await createOrder({
+      // add to database order
+      const responCreateOrder = await createOrder({
         orderItems: cart.cartItems,
         userId: auth.userInfo._id,
         shippingDetails: cart.shippingDetails,
@@ -37,8 +53,32 @@ const PlaceOrderScreen = () => {
         shippingPrice: cart.shippingDetails.shippingPrice,
         totalPrice: cart.shippingDetails.totalPrice,
       }).unwrap();
-      dispatch(clearCartItems());
-      navigate(`/order/${res._id}`);
+
+      if (responCreateOrder) {
+        // payment
+        const responPayOrder = await payOrder({
+          orderId: responCreateOrder._id,
+          details: {
+            transaction_details: {
+              order_id: responCreateOrder._id,
+              gross_amount: responCreateOrder.totalPrice,
+            },
+            customer_details: {
+              name: responCreateOrder.user.name,
+              email: responCreateOrder.user.email,
+            },
+            callbacks: {
+              finish: `/thanks`,
+            },
+          },
+        }).unwrap();
+
+        if (responPayOrder && responPayOrder.token) {
+          window.snap.pay(responPayOrder.token);
+        } else {
+          console.log('Token tidak tersedia dalam respons');
+        }
+      }
     } catch (err) {
       toast.error(err);
     }
@@ -115,7 +155,7 @@ const PlaceOrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Shipping</Col>
-                  <Col>{formatRupiah(cart.shippingDetails.costDelivery)}</Col>
+                  <Col>{formatRupiah(cart.shippingDetails.shippingPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>

@@ -15,10 +15,12 @@ import moment from 'moment';
 const OrderScreen = () => {
   const { id: orderId } = useParams();
 
-  const { data, refetch, isLoading, error } = useGetOrderDetailsQuery(orderId);
-
-  const { order, client_key } = data || {};
-  console.log(order);
+  const {
+    data: order,
+    refetch,
+    isLoading,
+    error,
+  } = useGetOrderDetailsQuery(orderId);
 
   const [payOrder] = usePayOrderMutation();
 
@@ -67,7 +69,7 @@ const OrderScreen = () => {
 
   useEffect(() => {
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    const clientKey = client_key;
+    const clientKey = 'SB-Mid-client-xMuaOFLhxcnaElJS';
     const script = document.createElement('script');
     script.src = snapScript;
     script.setAttribute('data-client-key', clientKey);
@@ -78,7 +80,7 @@ const OrderScreen = () => {
     return () => {
       document.body.removeChild(script);
     };
-  }, [client_key]);
+  }, []);
 
   return isLoading ? (
     <Loader />

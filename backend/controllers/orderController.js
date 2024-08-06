@@ -70,10 +70,8 @@ const getOrderById = asyncHandler(async (req, res) => {
     .populate('user', 'name email')
     .populate('orderItems.product', 'name image price');
 
-  const client_key = process.env.MD_CLIENT_KEY;
-
   if (order) {
-    res.json({ order, client_key });
+    res.json(order);
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -93,7 +91,7 @@ const createTransaction = asyncHandler(async (req, res) => {
 // @access  Private
 const getTransactions = asyncHandler(async (req, res) => {});
 
-const getTransactionsById = asyncHandler(async (req, res) => {
+const getUpdatePayOrder = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
   if (order) {
@@ -102,7 +100,7 @@ const getTransactionsById = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
 
-    res.json(updatedOrder);
+    res.json(updatedOrder.isPaid);
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -141,40 +139,8 @@ export {
   getMyOrders,
   getOrderById,
   getTransactions,
-  getTransactionsById,
+  getUpdatePayOrder,
   updateOrderToDelivered,
   createTransaction,
   getOrders,
-};
-
-const product = {
-  orderItems: [
-    {
-      _id: '66a74c21a6f992036ccf308a',
-      name: 'iPhone 13 Pro 256GB Memory',
-      image: '/images/phone.jpg',
-      brand: 'Apple',
-      description:
-        'Introducing the iPhone 13 Pro. A transformative triple-camera system that adds tons of capability without complexity. An unprecedented leap in battery life',
-      price: 200000,
-      countInStock: 7,
-      __v: 0,
-      createdAt: '2024-07-29T08:00:33.429Z',
-      updatedAt: '2024-07-29T08:00:33.429Z',
-      qty: 1,
-    },
-  ],
-  userId: '66a74c21a6f992036ccf3086',
-  shippingDetails: {
-    address:
-      'Jln.Janti, Gg.Ontoseno, RT/TW.04/09, No.92B, Karangjambe, Banguntapan, Bantul DIY',
-    selectedProvince: '5',
-    selectedCity: '39',
-    recipientName: 'All fine Maulinaro',
-    curierNote: '',
-    numberPhone: '085374169758',
-    costDelivery: '20000',
-    totalPrice: 220000,
-  },
-  totalPrice: 220000,
 };
