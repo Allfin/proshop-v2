@@ -1,6 +1,9 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 const url = 'https://api.rajaongkir.com/starter';
 
+// @desc get province
+// @route   GET /api/shipping/province
+// @access  Private
 const getProvince = asyncHandler(async (req, res) => {
   try {
     const response = await fetch(`${url}/province`, {
@@ -14,6 +17,9 @@ const getProvince = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc get city by id
+// @route   GET /api/shipping/city/:id
+// @access  Private
 const getCity = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
@@ -28,9 +34,11 @@ const getCity = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc get cost shipping
+// @route   POST /api/shipping/cost
+// @access  Private
 const getCost = asyncHandler(async (req, res) => {
   const { origin, destination, weight, courier } = req.body;
-  console.log(typeof weight);
   try {
     const response = await fetch(`${url}/cost`, {
       method: 'POST',

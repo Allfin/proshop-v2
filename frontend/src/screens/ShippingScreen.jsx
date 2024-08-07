@@ -48,6 +48,10 @@ const ShippingScreen = () => {
       ...formData,
       [name]: value,
     });
+
+    if (name === 'selectedCity') {
+      costDeliveryList();
+    }
   };
 
   const submitHandler = (event) => {
@@ -75,27 +79,27 @@ const ShippingScreen = () => {
     setValidated(true);
   };
 
-  useEffect(() => {
-    const costDeliveryList = async () => {
-      try {
-        const response = await getCost({
-          body: {
-            origin: '1',
-            destination: '1',
-            weight: 1,
-            courier: 'jne',
-          },
-        }).unwrap();
-        setDeliveryList(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const costDeliveryList = async () => {
+    try {
+      const response = await getCost({
+        body: {
+          origin: '278',
+          destination: formData.selectedCity,
+          weight: cart.weight,
+          courier: 'jne',
+        },
+      }).unwrap();
+      setDeliveryList(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    return () => {
+  useEffect(() => {
+    if (formData.selectedCity) {
       costDeliveryList();
-    };
-  }, [formData.setDeliveryList, getCost]);
+    }
+  }, []);
 
   return (
     <FormContainer>

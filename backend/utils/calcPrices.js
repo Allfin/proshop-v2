@@ -31,3 +31,14 @@ export function calcPrices(orderItems) {
     totalPrice,
   };
 }
+
+export function calcShippingCost(orderItems) {
+  // Calculate the items price in whole number (pennies) to avoid issues with
+  // floating point number calculations
+  const itemsPrice = orderItems.reduce(
+    (acc, item) => acc + (item.weight * 100 * item.qty) / 100,
+    0
+  );
+
+  return itemsPrice;
+}

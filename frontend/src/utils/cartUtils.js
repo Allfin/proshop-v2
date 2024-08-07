@@ -14,11 +14,21 @@ export const updateCart = (state) => {
     (acc, item) => acc + (item.price * 100 * item.qty) / 100,
     0
   );
+
+  // floating point number calculations
+  const weightTotal = state.cartItems.reduce(
+    (acc, item) => acc + (item.weight * 100 * item.qty) / 100,
+    0
+  );
+
   state.itemsPrice = addDecimals(itemsPrice);
 
   // Calculate the shipping price
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
   state.shippingPrice = addDecimals(shippingPrice);
+
+  // Calculate cost by weight
+  state.weight = addDecimals(weightTotal);
 
   const totalPrice = itemsPrice + shippingPrice;
   // Calculate the total price
