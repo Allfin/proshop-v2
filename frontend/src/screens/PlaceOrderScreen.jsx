@@ -26,8 +26,6 @@ const PlaceOrderScreen = () => {
   useEffect(() => {
     if (!cart.shippingDetails.address) {
       navigate('/shipping');
-    } else if (!cart.paymentMethod) {
-      navigate('/payment');
     }
 
     const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
