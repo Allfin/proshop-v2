@@ -27,7 +27,7 @@ export const updateCart = (state) => {
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
   state.shippingPrice = addDecimals(shippingPrice);
 
-  // Calculate cost by weight
+  // Calculate weight products
   state.weight = addDecimals(weightTotal);
 
   const totalPrice = itemsPrice + shippingPrice;
@@ -39,5 +39,3 @@ export const updateCart = (state) => {
 
   return state;
 };
-
-export const updateCost = (state) => {};

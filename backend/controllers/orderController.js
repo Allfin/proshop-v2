@@ -92,7 +92,10 @@ const createTransaction = asyncHandler(async (req, res) => {
 const getTransactions = asyncHandler(async (req, res) => {});
 
 const getUpdatePayOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id).populate(
+    'orderItems.product',
+    'name price'
+  );
 
   if (order) {
     order.isPaid = true;
@@ -100,7 +103,7 @@ const getUpdatePayOrder = asyncHandler(async (req, res) => {
 
     const updatedOrder = await order.save();
 
-    res.json(updatedOrder.isPaid);
+    res.json(updatedOrder);
   } else {
     res.status(404);
     throw new Error('Order not found');
