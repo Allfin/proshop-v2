@@ -21,6 +21,8 @@ const PlaceOrderScreen = () => {
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
   const [payOrder] = usePayOrderMutation();
 
+  console.log(cart);
+
   useEffect(() => {
     if (!cart.shippingDetails.address) {
       navigate('/shipping');
@@ -86,7 +88,7 @@ const PlaceOrderScreen = () => {
 
   return (
     <>
-      <CheckoutSteps step1 step2 step3 step4 />
+      <CheckoutSteps step1 step2 step3 />
       <Row>
         <Col md={8}>
           <ListGroup variant='flush'>
@@ -98,12 +100,6 @@ const PlaceOrderScreen = () => {
                 {cart.shippingDetails.postalCode},{' '}
                 {cart.shippingDetails.country}
               </p>
-            </ListGroup.Item>
-
-            <ListGroup.Item>
-              <h2>Payment Method</h2>
-              <strong>Method: </strong>
-              {cart.paymentMethod}
             </ListGroup.Item>
 
             <ListGroup.Item>
@@ -148,7 +144,7 @@ const PlaceOrderScreen = () => {
               </ListGroup.Item>
               <ListGroup.Item>
                 <Row>
-                  <Col>Items</Col>
+                  <Col>Items Price</Col>
                   <Col>{formatRupiah(cart.itemsPrice)}</Col>
                 </Row>
               </ListGroup.Item>
@@ -175,7 +171,7 @@ const PlaceOrderScreen = () => {
                   disabled={cart.cartItems === 0}
                   onClick={placeOrderHandler}
                 >
-                  Place Order
+                  Bayar
                 </Button>
                 {isLoading && <Loader />}
               </ListGroup.Item>

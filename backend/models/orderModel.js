@@ -5,9 +5,6 @@ const orderSchema = mongoose.Schema(
     snap_redirect_url: {
       type: String,
     },
-    payment_method: {
-      type: String,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

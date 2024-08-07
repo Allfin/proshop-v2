@@ -70,7 +70,7 @@ const ShippingScreen = () => {
             parseInt(cart.itemsPrice, 10),
         })
       );
-      navigate('/payment');
+      navigate('/placeorder');
     }
     setValidated(true);
   };
