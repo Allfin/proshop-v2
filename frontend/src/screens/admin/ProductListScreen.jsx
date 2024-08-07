@@ -10,6 +10,7 @@ import {
   useCreateProductMutation,
 } from '../../slices/productsApiSlice';
 import { toast } from 'react-toastify';
+import { formatRupiah } from '../../utils/price';
 
 const ProductListScreen = () => {
   const { pageNumber } = useParams();
@@ -73,8 +74,6 @@ const ProductListScreen = () => {
                 <th>ID</th>
                 <th>NAME</th>
                 <th>PRICE</th>
-                <th>CATEGORY</th>
-                <th>BRAND</th>
                 <th></th>
               </tr>
             </thead>
@@ -83,9 +82,7 @@ const ProductListScreen = () => {
                 <tr key={product._id}>
                   <td>{product._id}</td>
                   <td>{product.name}</td>
-                  <td>${product.price}</td>
-                  <td>{product.category}</td>
-                  <td>{product.brand}</td>
+                  <td>{formatRupiah(product.price)}</td>
                   <td>
                     <Button
                       as={Link}
