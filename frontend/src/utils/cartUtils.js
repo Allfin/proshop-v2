@@ -7,7 +7,7 @@ export const addDecimals = (num) => {
 // Our addDecimals function expects a number and returns a string, so it is not
 // correct to call it passing a string as the argument.
 
-export const updateCart = (state) => {
+export const updateCart = (state, item) => {
   // Calculate the items price in whole number (pennies) to avoid issues with
   // floating point number calculations
   const itemsPrice = state.cartItems.reduce(
@@ -24,13 +24,14 @@ export const updateCart = (state) => {
   state.itemsPrice = addDecimals(itemsPrice);
 
   // Calculate the shipping price
-  const shippingPrice = itemsPrice > 100 ? 0 : 10;
-  state.shippingPrice = addDecimals(shippingPrice);
+  const shippingPrice = item.shippingPrice;
+  state.shippingPrice = addDecimals(Number(shippingPrice));
 
   // Calculate weight products
   state.weight = addDecimals(weightTotal);
 
   const totalPrice = itemsPrice + shippingPrice;
+  console.log(typeof itemPrice);
   // Calculate the total price
   state.totalPrice = addDecimals(totalPrice);
 

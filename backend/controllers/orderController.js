@@ -86,11 +86,11 @@ const createTransaction = asyncHandler(async (req, res) => {
   res.json({ token });
 });
 
-// @desc    Update order to paid
-// @route   GET /api/orders/:id/thanks/?order_id
-// @access  Private
 const getTransactions = asyncHandler(async (req, res) => {});
 
+// @desc    Update order to paid
+// @route   GET /api/orders/:id/thanks
+// @access  Private
 const getUpdatePayOrder = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id).populate(
     'orderItems.product',

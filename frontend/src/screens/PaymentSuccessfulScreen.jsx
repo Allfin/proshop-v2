@@ -30,9 +30,9 @@ const PaymentSuccessful = () => {
             <Col md={6}>
               <h5>Shipping Information</h5>
               <h5>Informasi Penerima</h5>
-              <p>Nama Penerima: {order.shippingDetails.recipientName}</p>
-              <p>Alamat: {order.shippingDetails.address}</p>
-              <p>No. Telp: {order.shippingDetails.numberPhone}</p>
+              <p>Nama Penerima: {order?.shippingDetails?.recipientName}</p>
+              <p>Alamat: {order?.shippingDetails?.address}</p>
+              <p>No. Telp: {order?.shippingDetails?.numberPhone}</p>
             </Col>
           </Row>
           <Table bordered>
@@ -46,7 +46,7 @@ const PaymentSuccessful = () => {
               </tr>
             </thead>
             <tbody>
-              {order.orderItems.map((item, index) => (
+              {order?.orderItems?.map((item, index) => (
                 <tr>
                   <td>{index + 1}</td>
                   <td>{item.product.name}</td>
@@ -63,13 +63,13 @@ const PaymentSuccessful = () => {
                 <th colSpan='4' className='text-right'>
                   Shipping
                 </th>
-                <th>{formatRupiah(order.shippingPrice)}</th>
+                <th>{formatRupiah(order?.shippingPrice)}</th>
               </tr>
               <tr>
                 <th colSpan='4' className='text-right'>
                   Total
                 </th>
-                <th>{formatRupiah(order.totalPrice)}</th>
+                <th>{formatRupiah(order?.totalPrice)}</th>
               </tr>
             </tfoot>
           </Table>

@@ -51,7 +51,6 @@ const PlaceOrderScreen = () => {
         shippingDetails: cart.shippingDetails,
         itemsPrice: cart.itemPrice,
         shippingPrice: cart.shippingDetails.shippingPrice,
-        totalPrice: cart.shippingDetails.totalPrice,
       }).unwrap();
 
       if (responCreateOrder) {

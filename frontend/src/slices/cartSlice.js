@@ -32,8 +32,10 @@ const cartSlice = createSlice({
       return updateCart(state);
     },
     saveShippingDetails: (state, action) => {
+      const { ...item } = action.payload;
       state.shippingDetails = action.payload;
       localStorage.setItem('cart', JSON.stringify(state));
+      return updateCart(state, item);
     },
     savePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;

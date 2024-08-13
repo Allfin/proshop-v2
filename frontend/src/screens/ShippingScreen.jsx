@@ -30,7 +30,7 @@ const ShippingScreen = () => {
   const [validated, setValidated] = useState(false);
 
   // Get list data province
-  const { data: provinceList, isLoading } = useGetProvinceQuery();
+  const { data: provinceList, isLoading, error } = useGetProvinceQuery();
 
   // Get list data city by id province
   const { data: cityList, isLoading: cityLoading } = useGetCityQuery(
@@ -49,9 +49,9 @@ const ShippingScreen = () => {
       [name]: value,
     });
 
-    if (name === 'selectedCity') {
-      costDeliveryList();
-    }
+    // if (name === 'selectedCity') {
+    //   costDeliveryList();
+    // }
   };
 
   const submitHandler = (event) => {
@@ -69,12 +69,9 @@ const ShippingScreen = () => {
           curierNote: formData.curierNote,
           numberPhone: formData.numberPhone,
           shippingPrice: formData.shippingPrice,
-          totalPrice:
-            parseInt(formData.shippingPrice, 10) +
-            parseInt(cart.itemsPrice, 10),
         })
       );
-      navigate('/placeorder');
+      // navigate('/placeorder');
     }
     setValidated(true);
   };
@@ -96,9 +93,9 @@ const ShippingScreen = () => {
   };
 
   useEffect(() => {
-    if (formData.selectedCity) {
-      costDeliveryList();
-    }
+    // if (formData.selectedCity) {
+    //   costDeliveryList();
+    // }
   }, []);
 
   return (
@@ -153,7 +150,7 @@ const ShippingScreen = () => {
             {isLoading ? (
               <option disabled>Loading...</option>
             ) : (
-              provinceList.map((provinceData) => (
+              provinceList?.map((provinceData) => (
                 <option
                   key={provinceData.province_id}
                   value={provinceData.province_id}

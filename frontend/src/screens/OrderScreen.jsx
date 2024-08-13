@@ -81,6 +81,7 @@ const OrderScreen = () => {
       document.body.removeChild(script);
     };
   }, []);
+  console.log(order);
 
   return isLoading ? (
     <Loader />
