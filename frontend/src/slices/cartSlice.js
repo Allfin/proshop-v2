@@ -13,7 +13,6 @@ const cartSlice = createSlice({
       // NOTE: we don't need user, rating, numReviews or reviews
       // in the cart
       const { user, rating, numReviews, reviews, ...item } = action.payload;
-      console.log(item);
 
       const existItem = state.cartItems.find((x) => x._id === item._id);
 
@@ -28,6 +27,7 @@ const cartSlice = createSlice({
       return updateCart(state, item);
     },
     removeFromCart: (state, action) => {
+      console.log(action.payload);
       state.cartItems = state.cartItems.filter((x) => x._id !== action.payload);
       return updateCart(state);
     },
@@ -36,6 +36,11 @@ const cartSlice = createSlice({
       state.shippingDetails = action.payload;
       localStorage.setItem('cart', JSON.stringify(state));
       return updateCart(state, item);
+    },
+    saveShippingPrice: (state, action) => {
+      state.shippingPrice = action.payload;
+      state.totalPrice = state.shippingPrice + state.itemsPrice;
+      localStorage.setItem('cart', JSON.stringify(state));
     },
     savePaymentMethod: (state, action) => {
       state.paymentMethod = action.payload;
@@ -55,6 +60,7 @@ export const {
   addToCart,
   removeFromCart,
   saveShippingDetails,
+  saveShippingPrice,
   savePaymentMethod,
   clearCartItems,
   resetCart,

@@ -24,6 +24,7 @@ const CartScreen = () => {
   // NOTE: no need for an async function here as we are not awaiting the
   // resolution of a Promise
   const addToCartHandler = (product, qty) => {
+    console.log(qty);
     dispatch(addToCart({ ...product, qty }));
   };
 
@@ -88,17 +89,37 @@ const CartScreen = () => {
       <Col md={4}>
         <Card>
           <ListGroup variant='flush'>
-            <ListGroup.Item>
+            <ListGroup.Item style={{ backgroundColor: '#ddd' }}>
               <h2>
-                Jumlah ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
-                kain
+                Jumlah Kain (
+                {cartItems.reduce((acc, item) => acc + item.qty, 0)})
               </h2>
-              {formatRupiah(
-                cartItems.reduce((acc, item) => acc + item.qty * item.price, 0)
-              )}
-            </ListGroup.Item>
-            <ListGroup.Item>
+              <Row>
+                <Col>
+                  <p>Total Harga</p>
+                </Col>
+                <Col>
+                  <p>
+                    {formatRupiah(
+                      cartItems.reduce(
+                        (acc, item) => acc + item.qty * item.price,
+                        0
+                      )
+                    )}
+                  </p>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <p>Biaya Pengiriman</p>
+                </Col>
+                <Col>
+                  <p>-</p>
+                </Col>
+              </Row>
+              <hr />
               <Button
+                style={{ width: '100%' }}
                 variant='success'
                 type='button'
                 className='btn-block'

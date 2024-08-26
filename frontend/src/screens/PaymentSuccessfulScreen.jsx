@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useUpdatePayOrderQuery } from '../slices/ordersApiSlice';
 import { useDispatch } from 'react-redux';
@@ -16,7 +16,6 @@ const PaymentSuccessful = () => {
   const orderId = query.get('order_id');
 
   const { data: order } = useUpdatePayOrderQuery(orderId);
-  console.log(order);
 
   const clacSubTotal = (price, qty) => price * qty;
   return (

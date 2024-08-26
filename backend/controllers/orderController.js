@@ -10,7 +10,8 @@ dotenv.config();
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = asyncHandler(async (req, res) => {
-  const { orderItems, shippingDetails, totalPrice, shippingPrice } = req.body;
+  const { orderItems, shippingDetails, totalPrice, shippingPrice, itemsPrice } =
+    req.body;
 
   if (orderItems && orderItems.length === 0) {
     res.status(400);
@@ -31,6 +32,7 @@ const addOrderItems = asyncHandler(async (req, res) => {
       const matchingItemFromDB = itemsFromDB.find(
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
       );
+      // console.log(matchingItemFromDB);
       return {
         ...itemFromClient,
         product: itemFromClient._id,
@@ -39,11 +41,13 @@ const addOrderItems = asyncHandler(async (req, res) => {
       };
     });
 
+    console.log(dbOrderItems);
+
     const order = new Order({
       orderItems: dbOrderItems,
       user: req.body.userId,
       shippingDetails,
-      itemsPrice: dbOrderItems.itemsPrice,
+      itemsPrice,
       shippingPrice,
       totalPrice,
     });
@@ -58,7 +62,9 @@ const addOrderItems = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find({ user: req.user._id });
+  const orders = await Order.find({ user: req.user._id }).sort({
+    createdAt: -1,
+  });
   res.json(orders);
 });
 
@@ -70,43 +76,62 @@ const getOrderById = asyncHandler(async (req, res) => {
     .populate('user', 'name email')
     .populate('orderItems.product', 'name image price');
 
-  if (order) {
+  try {
+    const status = await snap.transaction.status(req.params.id);
+
+    if (status?.transaction_status === 'settlement') {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+
+      const updatedOrder = await order.save();
+
+      res.json(updatedOrder);
+    }
+  } catch (error) {
     res.json(order);
-  } else {
-    res.status(404);
-    throw new Error('Order not found');
   }
 });
 
 // @desc    Paid order
-// @route   POST /api/orders/:id/
+// @route   POST /api/orders/pay/
 // @access  Private
 const createTransaction = asyncHandler(async (req, res) => {
-  const token = await snap.createTransactionToken(req.body);
+  const token = await snap.createTransactionToken(req.body.details);
   res.json({ token });
 });
 
-const getTransactions = asyncHandler(async (req, res) => {});
-
-// @desc    Update order to paid
+// @desc    Paid order
 // @route   GET /api/orders/:id/thanks
 // @access  Private
+const statusPay = asyncHandler(async (req, res) => {
+  const status = await snap.transaction.status(req.params.id);
+
+  res.json(status);
+});
+
+// @desc    Update order to paid
+// @route   POST /api/orders/:id/thanks
+// @access  Private
 const getUpdatePayOrder = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate(
-    'orderItems.product',
-    'name price'
-  );
+  const status = await snap.transaction.status(req.params.id);
 
-  if (order) {
-    order.isPaid = true;
-    order.paidAt = Date.now();
+  if (status.transaction_status === 'settlement') {
+    const order = await Order.findById(req.params.id).populate(
+      'orderItems.product',
+      'name price'
+    );
 
-    const updatedOrder = await order.save();
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
 
-    res.json(updatedOrder);
-  } else {
-    res.status(404);
-    throw new Error('Order not found');
+      const updatedOrder = await order.save();
+
+      res.json(updatedOrder);
+    } else {
+      res.status(404);
+      throw new Error('Order not found');
+    }
   }
 });
 
@@ -141,7 +166,7 @@ export {
   addOrderItems,
   getMyOrders,
   getOrderById,
-  getTransactions,
+  statusPay,
   getUpdatePayOrder,
   updateOrderToDelivered,
   createTransaction,

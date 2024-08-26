@@ -36,7 +36,7 @@ const OrderScreen = () => {
         details: {
           transaction_details: {
             order_id: order._id,
-            gross_amount: order.totalPrice,
+            gross_amount: Number(order.totalPrice),
           },
           customer_details: {
             name: order.user.name,
@@ -57,6 +57,8 @@ const OrderScreen = () => {
       console.log('Gagal bayar', error);
     }
   };
+
+  console.log(order);
 
   const deliverHandler = async () => {
     await deliverOrder(orderId);
@@ -81,7 +83,6 @@ const OrderScreen = () => {
       document.body.removeChild(script);
     };
   }, []);
-  console.log(order);
 
   return isLoading ? (
     <Loader />

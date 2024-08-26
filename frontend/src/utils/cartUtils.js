@@ -23,20 +23,21 @@ export const updateCart = (state, item) => {
 
   state.itemsPrice = addDecimals(itemsPrice);
 
-  // Calculate the shipping price
-  const shippingPrice = item.shippingPrice;
-  state.shippingPrice = addDecimals(Number(shippingPrice));
-
   // Calculate weight products
   state.weight = addDecimals(weightTotal);
-
-  const totalPrice = itemsPrice + shippingPrice;
-  console.log(typeof itemPrice);
   // Calculate the total price
-  state.totalPrice = addDecimals(totalPrice);
+
+  const qtyTotal = state.cartItems.reduce((total, item) => total + item.qty, 0);
+
+  state.qty = addDecimals(qtyTotal);
 
   // Save the cart to localStorage
   localStorage.setItem('cart', JSON.stringify(state));
 
+  return state;
+};
+
+export const udpateTotalPrice = (state) => {
+  state.totalPrice = state.itemsPrice + state.shippingPrice;
   return state;
 };

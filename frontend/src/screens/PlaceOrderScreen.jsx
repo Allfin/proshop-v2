@@ -19,28 +19,7 @@ const PlaceOrderScreen = () => {
   const auth = useSelector((state) => state.auth);
 
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
-  const [payOrder] = usePayOrderMutation();
-
-  console.log(cart);
-
-  useEffect(() => {
-    if (!cart.shippingDetails.address) {
-      navigate('/shipping');
-    }
-
-    const snapScript = 'https://app.sandbox.midtrans.com/snap/snap.js';
-    const script = document.createElement('script');
-    const clientKey = 'SB-Mid-client-xMuaOFLhxcnaElJS';
-    script.src = snapScript;
-    script.setAttribute('data-client-key', clientKey);
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, [cart.paymentMethod, cart.shippingDetails.address, navigate]);
+  console.log(cart.itemsPrice);
 
   const placeOrderHandler = async () => {
     try {
@@ -49,35 +28,12 @@ const PlaceOrderScreen = () => {
         orderItems: cart.cartItems,
         userId: auth.userInfo._id,
         shippingDetails: cart.shippingDetails,
-        itemsPrice: cart.itemPrice,
+        itemsPrice: cart.itemsPrice,
         shippingPrice: cart.shippingDetails.shippingPrice,
+        totalPrice: cart.totalPrice,
       }).unwrap();
 
-      if (responCreateOrder) {
-        // payment
-        const responPayOrder = await payOrder({
-          orderId: responCreateOrder._id,
-          details: {
-            transaction_details: {
-              order_id: responCreateOrder._id,
-              gross_amount: responCreateOrder.totalPrice,
-            },
-            customer_details: {
-              name: responCreateOrder.user.name,
-              email: responCreateOrder.user.email,
-            },
-            callbacks: {
-              finish: `/thanks`,
-            },
-          },
-        }).unwrap();
-
-        if (responPayOrder && responPayOrder.token) {
-          window.snap.pay(responPayOrder.token);
-        } else {
-          console.log('Token tidak tersedia dalam respons');
-        }
-      }
+      navigate('/order/' + responCreateOrder._id);
     } catch (err) {
       toast.error(err);
     }
@@ -154,7 +110,7 @@ const PlaceOrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
-                  <Col>{formatRupiah(cart.shippingDetails.totalPrice)}</Col>
+                  <Col>{formatRupiah(cart.totalPrice)}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
@@ -168,7 +124,7 @@ const PlaceOrderScreen = () => {
                   disabled={cart.cartItems === 0}
                   onClick={placeOrderHandler}
                 >
-                  Bayar
+                  Place Order
                 </Button>
                 {isLoading && <Loader />}
               </ListGroup.Item>

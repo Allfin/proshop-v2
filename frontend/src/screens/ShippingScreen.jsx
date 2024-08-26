@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FormContainer from '../components/FormContainer';
 import CheckoutSteps from '../components/CheckoutSteps';
-import { saveShippingDetails } from '../slices/cartSlice';
+import { saveShippingDetails, saveShippingPrice } from '../slices/cartSlice';
 import {
   useGetCityQuery,
   useGetCostMutation,
@@ -48,10 +48,6 @@ const ShippingScreen = () => {
       ...formData,
       [name]: value,
     });
-
-    // if (name === 'selectedCity') {
-    //   costDeliveryList();
-    // }
   };
 
   const submitHandler = (event) => {
@@ -71,7 +67,7 @@ const ShippingScreen = () => {
           shippingPrice: formData.shippingPrice,
         })
       );
-      // navigate('/placeorder');
+      navigate('/placeorder');
     }
     setValidated(true);
   };
@@ -93,10 +89,14 @@ const ShippingScreen = () => {
   };
 
   useEffect(() => {
-    // if (formData.selectedCity) {
-    //   costDeliveryList();
-    // }
-  }, []);
+    if (formData.selectedCity) {
+      costDeliveryList();
+    }
+
+    if (formData.shippingPrice) {
+      dispatch(saveShippingPrice(Number(formData.shippingPrice)));
+    }
+  }, [formData.selectedCity, formData.shippingPrice]);
 
   return (
     <FormContainer>

@@ -2,9 +2,6 @@ import mongoose from 'mongoose';
 
 const orderSchema = mongoose.Schema(
   {
-    snap_redirect_url: {
-      type: String,
-    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
